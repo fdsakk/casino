@@ -16,6 +16,7 @@ import {
   authLimiter,
   spinLimiter,
   blackjackLimiter,
+  plinkoIpLimiter,
 } from "./middleware";
 import { AppError, ErrorCode } from "./lib/errors";
 import { handleMessage, type ServerMessage } from "./games/blackjack/wsHandler";
@@ -68,7 +69,14 @@ app.get("/health", async (c) => {
    Rate Limiting
    ============================================================================ */
 
-app.use("/api/*", apiLimiter);
+// Baseline limiter — applies to all /api/* routes except plinko, which has
+// its own higher ceiling to allow ball-spam UX. Plinko also enforces a
+// per-user Redis token bucket inside its service for fairness across IPs.
+app.use("/api/*", async (c, next) => {
+  if (c.req.path.startsWith("/api/plinko/")) return next();
+  return apiLimiter(c, next);
+});
+app.use("/api/plinko/*", plinkoIpLimiter);
 app.use("/api/auth/*", authLimiter);
 app.use("/api/casino/spin", spinLimiter);
 app.use("/api/blackjack/*", blackjackLimiter);

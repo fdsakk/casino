@@ -43,6 +43,7 @@ export const ErrorCode = {
   VALIDATION_ERROR: "validation_error",
   NOT_FOUND: "not_found",
   DUPLICATE: "duplicate",
+  RATE_LIMITED: "rate_limited",
 } as const;
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
@@ -72,6 +73,7 @@ const ERROR_STATUS_MAP: Record<ErrorCode, number> = {
   [ErrorCode.VALIDATION_ERROR]: 400,
   [ErrorCode.NOT_FOUND]: 404,
   [ErrorCode.DUPLICATE]: 409,
+  [ErrorCode.RATE_LIMITED]: 429,
 };
 
 // AppError — typed domain error class

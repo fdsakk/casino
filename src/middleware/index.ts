@@ -141,3 +141,15 @@ export const blackjackLimiter = rateLimiter({
   standardHeaders: "draft-6",
   keyGenerator: clientIp,
 });
+
+/**
+ * Plinko IP-level safeguard: high ceiling for spam-friendly play, but
+ * still caps a single IP to prevent DDoS amplification. Per-user budget
+ * is enforced separately by the Redis token bucket in PlinkoService.
+ */
+export const plinkoIpLimiter = rateLimiter({
+  windowMs: 60 * 1000,
+  limit: 800,
+  standardHeaders: "draft-6",
+  keyGenerator: clientIp,
+});
